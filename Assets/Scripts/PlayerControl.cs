@@ -19,7 +19,6 @@ public class CameraControl : MonoBehaviour
     private void Start()
     {
         MainCamera = GetComponent<Transform>();
-        OnEnable();
     }
 
     private void Update()
