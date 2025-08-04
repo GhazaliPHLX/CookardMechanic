@@ -22,7 +22,6 @@ public class CardControl : MonoBehaviour
     {
 
         Vector2 MousePosition = MousePos.action.ReadValue<Vector2>();
-        Vector2 worldPosition = Camera.main.ScreenToWorldPoint(MousePosition);
 
 
         if (click.action.WasPressedThisFrame())
@@ -40,18 +39,23 @@ public class CardControl : MonoBehaviour
             if(!isDragging && pressTime >= 0.1f)
             {
                 isDragging = true;
-                RaycastHit2D[] hits = Physics2D.RaycastAll(worldPosition, Vector2.zero);
-                if (hits.Length > 0)
-                {
-                    var hit = hits
-                        .OrderByDescending(h => h.collider.GetComponent<SpriteRenderer>()?.sortingOrder ?? 0 )
-                        .First(); 
 
+                Ray ray = Camera.main.ScreenPointToRay(MousePosition);
+                bool hashit = Physics.Raycast(ray,  out RaycastHit hit);
+
+                if (hashit)
+                {
                     Debug.Log("Dragged a gameObject");
                     var clickable = hit.collider.GetComponent<ILeftClick>();
                     clickable?.Clicked();
 
                     activeCard = hit.collider.GetComponent<CardMovement>();
+                }
+                else
+                {
+                    Debug.Log("No Gameobject found");
+                }
+
                 }
             }
 
@@ -75,18 +79,15 @@ public class CardControl : MonoBehaviour
 
             }
         }
-    }
-
-
-private void OnEnable()
+    private void OnEnable()
     {
         click.action.Enable();
         MousePos.action.Enable();
     }
-
     private void OnDisable()
     {
-        click.action.Disable(); 
+        click.action.Disable();
         MousePos.action.Disable();
     }
+
 }

@@ -17,6 +17,8 @@ public class CardMovement : MonoBehaviour, ILeftClick
         Debug.Log("LeftClicked Card");
         isDragging = true;
 
+        SortingManager.BringToFront(gameObject);
+
         Vector2 MousePosition = PointerPos.action.ReadValue<Vector2>();
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(MousePosition);
         worldPosition.z = 0;
