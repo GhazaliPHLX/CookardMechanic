@@ -12,9 +12,9 @@ public class CardMovement : MonoBehaviour, ILeftClick
     private bool isDragging = false;
     private Vector3 mouseOffset;
     private Vector2 MousePosition;
+    private SpriteRenderer card;
     public void Clicked()
     {
-        Debug.Log("LeftClicked Card");
         isDragging = true;
 
         SortingManager.BringToFront(gameObject);
@@ -29,6 +29,22 @@ public class CardMovement : MonoBehaviour, ILeftClick
     {
         if (isDragging)
         {
+            // Ngurus Stacking, bisa di refactor ntar klo sempet
+            Vector3 cardPos = transform.position;
+            Vector3 cardSize = card.bounds.extents;
+
+            GameObject topCard =  CardStacking.SortTopCard(cardPos, cardSize, gameObject);
+            
+
+            if (topCard != null && topCard != this.gameObject)
+            {
+                Debug.Log("TopCard found, otw Stacking");
+                var targetCard = topCard.GetComponent<CardComponent>();
+                var thisCard = GetComponent<CardComponent>();
+
+                thisCard.StackOnto(targetCard);
+            }
+
             isDragging = false;
         }
     }
@@ -36,6 +52,7 @@ public class CardMovement : MonoBehaviour, ILeftClick
         void Start()
     {
         cardPos = GetComponent<Transform>();
+        card = GetComponent<SpriteRenderer>();
         
     }
 

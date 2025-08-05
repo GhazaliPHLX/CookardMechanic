@@ -2,17 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CardStacking : MonoBehaviour
+public class CardStacking 
 {
-    // Start is called before the first frame update
-    void Start()
+    public static GameObject SortTopCard(Vector3 cardCenter, Vector3 halfExtents, GameObject self)
     {
-        
-    }
+        Collider[] hits =  Physics.OverlapBox(cardCenter, halfExtents);
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        GameObject topCard = null;
+        int highestOrder = int.MinValue;
+
+        foreach (var hit in hits)
+        {
+            if(hit.gameObject == self) continue;
+            var sr = hit.GetComponent<SpriteRenderer>();
+            if (sr != null && sr.sortingOrder > highestOrder)
+            {
+                Debug.Log("another Card Found");
+                highestOrder = sr.sortingOrder;
+                topCard = hit.gameObject;
+            }
+        }
+        return topCard;
     }
 }
