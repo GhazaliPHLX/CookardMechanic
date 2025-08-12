@@ -22,6 +22,10 @@ public class CardMovement : MonoBehaviour, ILeftClick
         Vector2 MousePosition = PointerPos.action.ReadValue<Vector2>();
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(MousePosition);
         worldPosition.z = 0;
+        if(cardPos == null)
+        {
+            cardPos = transform;
+        }
         mouseOffset = worldPosition - cardPos.position;
     }
 
@@ -44,6 +48,15 @@ public class CardMovement : MonoBehaviour, ILeftClick
 
                 thisCard.StackOnto(targetCard);
             }
+
+            if(topCard == null)
+            {
+                var thisCard = GetComponent<CardComponent>();
+                thisCard.ReleaseCard();
+                SortingManager.ReleasePosition(gameObject);
+
+            }
+
 
             isDragging = false;
         }
