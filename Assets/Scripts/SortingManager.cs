@@ -1,54 +1,47 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SortingManager
+public static class SortingManager
 {
     private static int currentSortingOrder = 0;
-    private static float zOffset = -0.01f;
+    private static Dictionary<GameObject, int> originalOrders = new Dictionary<GameObject, int>();
 
-    private static Dictionary<GameObject, (int sortingOrder, float zPos)> originalData
-        = new Dictionary<GameObject, (int, float)>();
+    public static void BringToFront(IEnumerable<GameObject> cards)
+    {
+        foreach (var c in cards)
+        {
+            if (c == null) continue;
+            var renderers = c.GetComponentsInChildren<SpriteRenderer>(true);
+            foreach (var sr in renderers)
+            {
+                if (!originalOrders.ContainsKey(sr.gameObject))
+                    originalOrders[sr.gameObject] = sr.sortingOrder;
+
+                currentSortingOrder++;
+                sr.sortingOrder = currentSortingOrder;
+            }
+        }
+    }
 
     public static void BringToFront(GameObject card)
     {
-        // Ambil semua SpriteRenderer dari card & child-nya
-        var renderers = card.GetComponentsInChildren<SpriteRenderer>();
-
-        foreach (var sr in renderers)
-        {
-            if (!originalData.ContainsKey(sr.gameObject))
-            {
-                originalData[sr.gameObject] = (sr.sortingOrder, sr.transform.position.z);
-            }
-
-            currentSortingOrder++;
-            sr.sortingOrder = currentSortingOrder;
-
-            Vector3 pos = sr.transform.position;
-            pos.z = currentSortingOrder * zOffset;
-            sr.transform.position = pos;
-        }
+        BringToFront(new[] { card });
     }
-
 
     public static void ReleasePosition(GameObject card)
     {
-        var renderers = card.GetComponentsInChildren<SpriteRenderer>();
-
+        if (card == null) return;
+        var renderers = card.GetComponentsInChildren<SpriteRenderer>(true);
         foreach (var sr in renderers)
         {
-            if (originalData.TryGetValue(sr.gameObject, out var data))
+            if (originalOrders.TryGetValue(sr.gameObject, out var ord))
             {
-                sr.sortingOrder = data.sortingOrder;
-
-                Vector3 pos = sr.transform.position;
-                pos.z = data.zPos;
-                sr.transform.position = pos;
-
-                originalData.Remove(sr.gameObject);
+                sr.sortingOrder = ord;
+                originalOrders.Remove(sr.gameObject);
             }
         }
-    }
 
+        if (originalOrders.Count == 0)
+            currentSortingOrder = 0;
+    }
 }

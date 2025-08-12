@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class CardComponent : MonoBehaviour
 {
-    public CardComponent parentCard;
-    public List<CardComponent> stackedCards = new List<CardComponent>();
+    public CardComponent cardAbove;
+    public CardComponent cardBelow;
 
     private static Transform cardsContainer;
 
@@ -17,25 +18,69 @@ public class CardComponent : MonoBehaviour
         }
     }
 
-    public void StackOnto(CardComponent target)
+    // Return list from this (bottom) up to top inclusive: [this, above, above.above, ...]
+    public List<CardComponent> GetStackAbove()
     {
-        Debug.Log($"Stacked {name} onto {target.name}");
-
-        parentCard = target;
-        target.stackedCards.Add(this);
-
-        transform.SetParent(cardsContainer); // tetap di container global
-        transform.position = target.transform.position + new Vector3(0, -0.2f, 0);
-
-        SortingManager.BringToFront(gameObject);
+        var list = new List<CardComponent>();
+        CardComponent cur = this;
+        while (cur != null)
+        {
+            list.Add(cur);
+            cur = cur.cardAbove;
+        }
+        return list;
     }
 
-    public void ReleaseCard()
+    // Return topmost node of this stack
+    public CardComponent GetTop()
     {
-        if (parentCard != null)
+        CardComponent cur = this;
+        while (cur != null && cur.cardAbove != null) cur = cur.cardAbove;
+        return cur;
+    }
+
+    public void DetachFromBelow()
+    {
+        if (cardBelow != null)
         {
-            parentCard.stackedCards.Remove(this);
-            parentCard = null;
+            cardBelow.cardAbove = null;
+            cardBelow = null;
         }
+    }
+
+    public void DetachAbove()
+    {
+        if (cardAbove != null)
+        {
+            cardAbove.cardBelow = null;
+            cardAbove = null;
+        }
+    }
+
+    // attach this (bottom) above 'below' (so this.cardBelow = below; below.cardAbove = this)
+    public void AttachBelow(CardComponent below)
+    {
+        DetachFromBelow();
+        cardBelow = below;
+        if (below != null) below.cardAbove = this;
+    }
+
+    // Snap moved stack visually so bottom (this) sits just below targetTop
+    public void SnapOnTopOf(CardComponent targetTop, float spacing)
+    {
+        var moved = GetStackAbove(); // this, this.cardAbove, ...
+        for (int i = 0; i < moved.Count; i++)
+        {
+            var node = moved[i];
+            Vector3 pos = targetTop.transform.position + Vector3.down * spacing * (i + 1);
+            pos.z = node.transform.position.z; // preserve z
+            node.transform.position = pos;
+        }
+    }
+
+    public void EnsureInContainer()
+    {
+        if (cardsContainer != null)
+            transform.SetParent(cardsContainer, true);
     }
 }
