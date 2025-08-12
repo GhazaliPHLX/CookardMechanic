@@ -68,8 +68,8 @@ public class CardControl : MonoBehaviour
 
                 else if(isDragging) 
                 {
-                    
                     activeCard?.Released();
+                Debug.Log("Released someting");
 
                 }
 
