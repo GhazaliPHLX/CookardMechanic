@@ -13,10 +13,10 @@ public class CardSortingHandler : MonoBehaviour
         originalZ = transform.position.z;
     }
 
-    public void BringToFront()
-    {
-        SortingManager.BringToFront(gameObject);
-    }
+    //public void BringToFront()
+    //{
+    //    SortingManager.BringToFront(gameObject);
+    //}
 
     public void ResetOrder()
     {

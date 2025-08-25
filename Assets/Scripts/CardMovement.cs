@@ -17,7 +17,7 @@ public class CardMovement : MonoBehaviour, ILeftClick
     {
         isDragging = true;
 
-        SortingManager.BringToFront(gameObject);
+        //SortingManager.BringToFront(gameObject);
 
         Vector2 MousePosition = PointerPos.action.ReadValue<Vector2>();
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(MousePosition);
@@ -37,25 +37,25 @@ public class CardMovement : MonoBehaviour, ILeftClick
             Vector3 cardPos = transform.position;
             Vector3 cardSize = card.bounds.extents;
 
-            GameObject topCard =  CardStacking.SortTopCard(cardPos, cardSize, gameObject);
+            //GameObject topCard =  CardStacking.SortTopCard(cardPos, cardSize, gameObject);
             
 
-            if (topCard != null && topCard != this.gameObject)
-            {
-                Debug.Log("TopCard found, otw Stacking");
-                var targetCard = topCard.GetComponent<CardComponent>();
-                var thisCard = GetComponent<CardComponent>();
+            //if (topCard != null && topCard != this.gameObject)
+            //{
+            //    Debug.Log("TopCard found, otw Stacking");
+            //    var targetCard = topCard.GetComponent<CardComponent>();
+            //    var thisCard = GetComponent<CardComponent>();
 
-                thisCard.StackOnto(targetCard);
-            }
+            //    thisCard.StackOnto(targetCard);
+            //}
 
-            if(topCard == null)
-            {
-                var thisCard = GetComponent<CardComponent>();
-                thisCard.ReleaseCard();
-                SortingManager.ReleasePosition(gameObject);
+            //if(topCard == null)
+            //{
+            //    var thisCard = GetComponent<CardComponent>();
+            //    thisCard.ReleaseCard();
+            //    SortingManager.ReleasePosition(gameObject);
 
-            }
+            //}
 
 
             isDragging = false;
